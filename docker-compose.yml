@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  web-service:
+    build: .
+    container_name: test_nginx
+    ports:
+      - "8080:80/tcp"
+      - "8080:80/udp" 
+      - "8443:443/tcp"
+      - "8443:443/udp"
+    networks:
+      - my-network
+    volumes:
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  curl:
+    build:
+      context: .
+      dockerfile: Dockerfile.curl_http3
+    container_name: curl
+    depends_on:
+      - web-service
+    networks:
+      - my-network
+    command: >
+        sh -c "sleep 5 && while true; do curl --http3 -I https://web-service:443; sleep 2; done"
+
+networks:
+  my-network:
+    driver: bridge
+

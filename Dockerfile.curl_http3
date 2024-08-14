@@ -1,0 +1,9 @@
+FROM alpine/curl-http3
+
+USER root
+
+COPY ./nginx/ssl/rootCA.pem /usr/local/share/ca-certificates/rootCA.pem
+RUN cp /usr/local/share/ca-certificates/rootCA.pem /etc/ssl/certs/ && \
+    cat /usr/local/share/ca-certificates/rootCA.pem >> /etc/ssl/certs/ca-certificates.crt
+
+USER nobody
