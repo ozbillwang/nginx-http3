@@ -40,11 +40,21 @@ cp "$(mkcert -CAROOT)/rootCA.pem" nginx/ssl/rootCA.pem
 # With everything in place, we can now launch our Docker Compose configuration.
 
 # Start the Services
-docker compose up -d
+$ docker compose up -d
+$ docker ps -a
 
-# Monitor the Curl Service
-# To verify that our curl service is sending HTTP/3 requests, you can check the logs:
-docker logs -f curl-http3
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS          PORTS                                                                                      NAMES
+8084f84a597a   nginx-http3-curl          "sh -c 'sleep 5 && w…"   19 minutes ago   Up 19 minutes                                                                                              curl-http3
+a285eabfd1b3   nginx-http3-web-service   "nginx -g 'daemon of…"   19 minutes ago   Up 19 minutes   0.0.0.0:8080->80/tcp, 0.0.0.0:8080->80/udp, 0.0.0.0:8443->443/tcp, 0.0.0.0:8443->443/udp   nginx-http3
+
+# To verify that our curl service is sending HTTP/3 requests
+$ docker logs -f curl-http3
+
+...
+HTTP/3 200
+...
+
+# So you can confirm now, that you connect the web service with HTTP/3 
 
 # Clean Up
 # When you’re done testing, you can stop and remove the containers with:
