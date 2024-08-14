@@ -12,3 +12,13 @@ cp localhost+3-key.pem nginx/ssl/nginx.key
 
 # only for testing
 cp "$(mkcert -CAROOT)/rootCA.pem" nginx/ssl/rootCA.pem
+
+# run 
+
+docker compose up -d
+
+# checking
+docker logs -f curl-http3
+
+# clean
+docker compose down

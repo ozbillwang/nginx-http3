@@ -2,8 +2,10 @@ version: '3.9'
 
 services:
   web-service:
-    build: .
-    container_name: test_nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx-http3
+    container_name: nginx-http3 
     ports:
       - "8080:80/tcp"
       - "8080:80/udp" 
@@ -18,8 +20,8 @@ services:
   curl:
     build:
       context: .
-      dockerfile: Dockerfile.curl_http3
-    container_name: curl
+      dockerfile: Dockerfile.curl-http3
+    container_name: curl-http3
     depends_on:
       - web-service
     networks:
