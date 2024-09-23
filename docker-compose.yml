@@ -1,6 +1,21 @@
 version: '3.9'
 
 services:
+  mkcert-service:
+    image: alpine/mkcert
+    container_name: mkcert-service
+    networks:
+      - my-network
+    volumes:
+      - ./nginx/ssl:/certs # Shared volume for certificates
+    command: >
+      sh -c "mkcert -install && \
+             mkcert localhost 127.0.0.1 web-service ::1 && \
+             mkdir -p /certs && \
+             cp localhost+3.pem /certs/nginx.crt && \
+             cp localhost+3-key.pem /certs/nginx.key && \
+             cp $(mkcert -CAROOT)/rootCA.pem /certs/rootCA.pem"
+
   web-service:
     build:
       context: .
@@ -13,8 +28,10 @@ services:
       - "8443:443/udp"
     networks:
       - my-network
+    depends_on:
+      - mkcert-service
     volumes:
-      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro # Volume for SSL certificates
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
   curl:
@@ -27,9 +44,11 @@ services:
     networks:
       - my-network
     command: >
-        sh -c "sleep 5 && while true; do curl --http3 -I https://web-service:443; sleep 2; done"
+        sh -c "sleep 5 && while true; do curl --version; curl --http3 -I https://web-service:443; sleep 2; done"
 
 networks:
   my-network:
     driver: bridge
 
+volumes:
+  certs:
